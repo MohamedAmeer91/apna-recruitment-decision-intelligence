@@ -4,3 +4,5 @@
 *.md text eol=lf
 *.txt text eol=lf
 *.json text eol=lf
+data/records.csv -text
+generate_data.py -text
