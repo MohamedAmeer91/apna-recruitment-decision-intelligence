@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+# root .gitignore ignores any tests/ folder; keep web tests tracked
+!tests/
