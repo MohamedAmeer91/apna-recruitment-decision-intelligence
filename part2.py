@@ -42,20 +42,7 @@ def main():
         rows.append([tau, tp, fp, tn, fn, m["recall"], m["fpr"]])
     c.write_csv("part2_thresholds.csv", ["tau", "tp", "fp", "tn", "fn", "tpr", "fpr"], rows)
     # 2.7
-    fold = np.arange(len(ytr)) % 5
-    cv_rows = []
-    best_k, best_f1 = None, -1.0
-    for k in range(1, 22, 2):
-        f1s = []
-        for f in range(5):
-            ref = fold != f
-            hold = fold == f
-            pred = c.knn_predict(Ztr[ref], ytr[ref], Ztr[hold], k)
-            f1s.append(c.metrics(*c.confusion(ytr[hold], pred))["f1"])
-        mean_f1 = sum(f1s) / 5
-        cv_rows.append([k, mean_f1])
-        if mean_f1 > best_f1:
-            best_k, best_f1 = k, mean_f1
+    cv_rows, best_k = c.knn_cv(Ztr, ytr)
     c.write_csv("part2_knn_cv.csv", ["K", "mean_cv_f1"], cv_rows)
     out.append(("knn_best_k", best_k))
     pred = c.knn_predict(Ztr, ytr, Zte, best_k)

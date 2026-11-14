@@ -160,6 +160,25 @@ def knn_predict(Zref, yref, Zq, k):
     return knn_pos_counts(Zref, yref, Zq, k) >= (k + 1) // 2
 
 
+def knn_cv(Ztr, ytr):
+    """5-fold CV over odd K = 1..21 on the training rows; returns (rows, best_k)."""
+    fold = np.arange(len(ytr)) % 5
+    rows = []
+    best_k, best_f1 = None, -1.0
+    for k in range(1, 22, 2):
+        f1s = []
+        for f in range(5):
+            ref = fold != f
+            hold = fold == f
+            pred = knn_predict(Ztr[ref], ytr[ref], Ztr[hold], k)
+            f1s.append(metrics(*confusion(ytr[hold], pred))["f1"])
+        mean_f1 = sum(f1s) / 5
+        rows.append([k, mean_f1])
+        if mean_f1 > best_f1:
+            best_k, best_f1 = k, mean_f1
+    return rows, best_k
+
+
 def cost(fp, fn):
     return 50 * fp + 400 * fn
 
